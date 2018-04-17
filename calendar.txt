@@ -1,7 +1,5 @@
-2017-10-21:budget meeting	
-2017-10-22:go to the gym	
+2017-02-12:lunch with sid	dinner with Jane	
+2017-02-28:Python class	
+2017-03-29:Change oil in blue car	Fix tree near front walkway	
+2017-05-06:Sid's birthday	
 2017-10-23:go to the gym	
-2017-11-01:Make sure to submit csc108 assignment 2	
-2017-12-02:Make sure to submit csc108 assignment 3	
-2017-11-06:Term test 2	Sid's birthday	
-2017-10-29:Get salad stuff,lettuce, red peppers, green peppers	
