@@ -71,27 +71,27 @@ def user_interface():
     :return: None
     '''
     # Your code goes here
-    c = calendar.load_calendar()
+    myCalendar = calendar.load_calendar()
     print("calendar loaded")
     while True:
         command = input("command: ")
         result = calendar.parse_command(command)
         if result[0] != "error":
             if result[0] == "quit":
-                calendar.save_calendar(c)
+                calendar.save_calendar(myCalendar)
                 print("calendar saved")
                 break
             elif result[0] == "help":
                 help = calendar.command_help()
                 print(help)
             elif result[0] == "add":
-                calendar.command_add(result[1], result[2], c)
+                calendar.command_add(result[1], result[2], myCalendar)
                 print("added")
             elif result[0] == "show":
-                show = calendar.command_show(c)
+                show = calendar.command_show(myCalendar)
                 print(show)
             elif result[0] == "delete":
-                calendar.command_delete(result[1], int(result[2]), c)
+                calendar.command_delete(result[1], int(result[2]), myCalendar)
                 print("deleted")
 
 
