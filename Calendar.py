@@ -137,12 +137,13 @@ def command_show(calendar):
     # Hint: Don't use \t (the tab character) to indent, or DocTest will fail
     # in the above testcase.
     # Put 4 spaces before the date, 8 spaces before each item.
+  
     Show = ""
     DateList = list(calendar.keys())
     DateList.sort()
     for Date in DateList:
-        Show += "\n    " + Date + ":"
         i = 0
+        Show += "\n    " + Date + ":"
         for detail in calendar[Date]:
             Show += "\n        " + str(i) + ": " + detail
             i += 1
@@ -197,17 +198,17 @@ def command_delete(date, entry_number, calendar):
     '''
 
     # YOUR CODE GOES HERE
-    if date not in calendar.keys():
-        return date + ' is not a date in the calendar'
-    else:
+    if date in calendar:
         if entry_number >= len(calendar[date]):
             return 'There is no entry ' + str(entry_number) + ' on date ' + date + ' in the calendar'
         else:
-            if len(calendar[date]) == 1:
+            if len(calendar[date]) < 2:
                 del calendar[date]
             else:
                 calendar[date].pop(entry_number)
             return ''
+    else:
+        return date + ' is not a date in the calendar'
 
 # -----------------------------------------------------------------------------
 # Functions dealing with calendar persistence
@@ -261,7 +262,6 @@ def save_calendar(calendar):
     '''
     # YOUR CODE GOES HERE
     DateList = list(calendar.keys())
-    DateList.sort()
 
     with open("calendar.txt", "w") as myFile:
         for date in DateList:
@@ -300,10 +300,11 @@ def load_calendar():
                 details = array[1].split("\t")
                 for detail in details:
                     calendar[array[0]].append(detail)
-                calendar[array[0]] = calendar[array[0]][:-1]
+                foo = calendar[array[0]][:-1]
+                calendar[array[0]] = foo
     else:
         file=open(myFile, "w+")
-    file.close()
+        file.close()
     return calendar
 
 
@@ -334,8 +335,12 @@ def is_command(command):
     '''
 
     # YOUR CODE GOES HERE
-    CommandList = ["add", "delete", "quit", "help", "show"]
-    return command in CommandList
+    
+    CommandList = ["add", "quit", "help", "delete", "show"]
+    if command in CommandList:
+        return True
+    else:
+        return False
 
 
 def is_calendar_date(date):
@@ -390,7 +395,7 @@ def is_calendar_date(date):
         DayNumber = int(date.split("-")[2])
 
         return MonthNumber < 13 and DayNumber < 32
-    except ValueError:
+    except:
         return False
 
 def is_natural_number(str):
@@ -422,7 +427,7 @@ def is_natural_number(str):
     # Check that all characters are in ["0123456789"]
 
     # YOUR CODE GOES HERE
-    NumberList = ["1","2","3","4","5","6","7","8","9","0"]
+    NumberList = "1234567890"
     if len(str) == 0:
         return False
     for i in str:
@@ -502,11 +507,6 @@ def parse_command(line):
             return ["error", "not a valid calendar date"]
         else:
             return ["add", CommandList[1], eventDetails]
-    elif CommandList[0] == "show":
-        if len(CommandList) != 1:
-            return ["error", "show"]
-        else:
-            return ["show"]
     elif CommandList[0] == "delete":
         if len(CommandList) != 3:
             return ["error", "delete DATE NUMBER"]
@@ -516,6 +516,11 @@ def parse_command(line):
             return ["error", "not a valid event index"]
         else:
             return ["delete", CommandList[1], CommandList[2]]
+    elif CommandList[0] == "show":
+        if len(CommandList) != 1:
+            return ["error", "show"]
+        else:
+            return ["show"]
     elif CommandList[0] == "quit":
         return ["quit"]
     else:
