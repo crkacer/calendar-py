@@ -102,9 +102,8 @@ def command_add(date, event_details, calendar):
 
     # YOUR CODE GOES HERE
 
-    if date not in calendar:
-        calendar[date] = []
-
+    if date not in calendar.keys():
+        calendar[date] = list()
     calendar[date].append(event_details)
     return ''
 
@@ -138,14 +137,17 @@ def command_show(calendar):
     # Hint: Don't use \t (the tab character) to indent, or DocTest will fail
     # in the above testcase.
     # Put 4 spaces before the date, 8 spaces before each item.
-    result = ""
-    for date in calendar:
-        result += "\n    " + date + ":"
-        index = 0
-        for event in calendar[date]:
-            result += "\n        " + str(index) + ": " + event
-            index += 1
-    return result
+  
+    Show = ""
+    DateList = list(calendar.keys())
+    DateList.sort()
+    for Date in DateList:
+        i = 0
+        Show += "\n    " + Date + ":"
+        for detail in calendar[Date]:
+            Show += "\n        " + str(i) + ": " + detail
+            i += 1
+    return Show
 
 def command_delete(date, entry_number, calendar):
     '''
@@ -196,10 +198,8 @@ def command_delete(date, entry_number, calendar):
     '''
 
     # YOUR CODE GOES HERE
-    if date not in calendar:
-        return date + ' is not a date in the calendar'
-    else:
-        if entry_number > len(calendar[date]):
+    if date in calendar:
+        if entry_number >= len(calendar[date]):
             return 'There is no entry ' + str(entry_number) + ' on date ' + date + ' in the calendar'
         else:
             if len(calendar[date]) < 2:
@@ -207,6 +207,8 @@ def command_delete(date, entry_number, calendar):
             else:
                 calendar[date].pop(entry_number)
             return ''
+    else:
+        return date + ' is not a date in the calendar'
 
 # -----------------------------------------------------------------------------
 # Functions dealing with calendar persistence
@@ -259,13 +261,14 @@ def save_calendar(calendar):
     explain to the grader/instructor in full how did you do the handling.
     '''
     # YOUR CODE GOES HERE
-    outfile = open("calendar.txt", "w")
-    for date in calendar:
-        outfile.write(date + ":")
-        for event in calendar[date]:
-            outfile.write(event + "\t")
-        outfile.write("\n")
-    outfile.close()
+    DateList = list(calendar.keys())
+
+    with open("calendar.txt", "w") as myFile:
+        for date in DateList:
+            myFile.write(date + ":")
+            for event in calendar[date]:
+                myFile.write(event + "\t")
+            myFile.write("\n")       
     return True
 
 
@@ -287,21 +290,21 @@ def load_calendar():
     '''
 
     # YOUR CODE GOES HERE
-    fn = "calendar.txt"
-    calendar = dict()
-    if os.path.exists(fn):
-        fh = open(fn, "r")
-        with fh as file:
+    myFile = "calendar.txt"
+    calendar = {}
+    if os.path.exists(myFile):
+        with open(myFile, "r") as file:
             for line in file:
-                arr = line.split(":")
-                calendar[arr[0]] = list()
-                events = arr[1].split("\t")
-                for event in events:
-                    calendar[arr[0]].append(event)
-                calendar[arr[0]] = calendar[arr[0]][:-1]
+                array = line.split(":")
+                calendar[array[0]] = list()
+                details = array[1].split("\t")
+                for detail in details:
+                    calendar[array[0]].append(detail)
+                foo = calendar[array[0]][:-1]
+                calendar[array[0]] = foo
     else:
-        open(fn, "w")
-    file.close()
+        file=open(myFile, "w+")
+        file.close()
     return calendar
 
 
@@ -332,8 +335,12 @@ def is_command(command):
     '''
 
     # YOUR CODE GOES HERE
-
-    return command in ["add", "delete", "quit", "help", "show"]
+    
+    CommandList = ["add", "quit", "help", "delete", "show"]
+    if command in CommandList:
+        return True
+    else:
+        return False
 
 
 def is_calendar_date(date):
@@ -379,15 +386,16 @@ def is_calendar_date(date):
     # 0123456789
 
     # YOUR CODE GOES HERE
-    if len(date) > 10 or len(date) < 10:
+    
+    if len(date) != 10:
         return False
     try:
-        month = int(date.split("-")[1])
-        day = int(date.split("-")[2])
+        YearNumber = int(date.split("-")[0])
+        MonthNumber = int(date.split("-")[1])
+        DayNumber = int(date.split("-")[2])
 
-        return month < 13 and day < 32
-
-    except ValueError:
+        return MonthNumber < 13 and DayNumber < 32
+    except:
         return False
 
 def is_natural_number(str):
@@ -419,11 +427,11 @@ def is_natural_number(str):
     # Check that all characters are in ["0123456789"]
 
     # YOUR CODE GOES HERE
-    numbers = "0123456789"
+    NumberList = "1234567890"
     if len(str) == 0:
         return False
     for i in str:
-        if i not in numbers:
+        if i not in NumberList:
             return False
     return True
 
@@ -487,37 +495,44 @@ def parse_command(line):
     # the final argument.
     # YOUR CODE GOES HERE
 
-    words = line.split();
+    CommandList = line.split();
 
-    if len(words) == 0:
+    if len(CommandList) == 0:
         return ["help"]
-    if words[0] == "add":
-        details = " ".join(words[2:])
-        if len(words) < 3:
+    if CommandList[0] == "add":
+        eventDetails = " ".join(CommandList[2:])
+        if len(CommandList) < 3:
             return ["error", "add DATE DETAILS"]
-        elif not is_calendar_date(words[1]):
+        elif not is_calendar_date(CommandList[1]):
             return ["error", "not a valid calendar date"]
         else:
-            return ["add", words[1], details]
-    elif words[0] == "show":
-        if len(words) != 1:
+            return ["add", CommandList[1], eventDetails]
+    elif CommandList[0] == "delete":
+        if len(CommandList) != 3:
+            return ["error", "delete DATE NUMBER"]
+        elif not is_calendar_date(CommandList[1]):
+            return ["error", "not a valid calendar date"]
+        elif not is_natural_number(CommandList[2]):
+            return ["error", "not a valid event index"]
+        else:
+            return ["delete", CommandList[1], CommandList[2]]
+    elif CommandList[0] == "show":
+        if len(CommandList) != 1:
             return ["error", "show"]
         else:
             return ["show"]
-    elif words[0] == "delete":
-        if len(words) != 3:
-            return ["error", "delete DATE NUMBER"]
-        elif not is_calendar_date(words[1]):
-            return ["error", "not a valid calendar date"]
-        elif not is_natural_number(words[2]):
-            return ["error", "not a valid event index"]
-        else:
-            return ["delete", words[1], words[2]]
-    elif words[0] == "quit":
+    elif CommandList[0] == "quit":
         return ["quit"]
     else:
         return ["help"]
 
 if __name__ == "__main__":
+    #calendar = {}
+    #command_add("2017-05-06", "Sid's birthday", calendar)
+    #command_add("2017-03-29", "Get salad stuff", calendar)
+    #print(command_show(calendar))
+    #print(command_delete("2017-03-29",1,calendar))
+    #print(parse_command("add 2015-10-21 budget meeting"))
     import doctest
     doctest.testmod()
+    
