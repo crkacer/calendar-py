@@ -81,18 +81,21 @@ def user_interface():
                 calendar.save_calendar(c)
                 print("calendar saved")
                 break
-            elif result[0] == "help":
-                help = calendar.command_help()
-                print(help)
             elif result[0] == "add":
                 calendar.command_add(result[1], result[2], c)
                 print("added")
-            elif result[0] == "show":
-                show = calendar.command_show(c)
-                print(show)
+            elif result[0] == "help":
+                res = calendar.command_help()
+                print(res)
             elif result[0] == "delete":
                 calendar.command_delete(result[1], int(result[2]), c)
                 print("deleted")
+            elif result[0] == "show":
+                res = calendar.command_show(c)
+                print(res)
+        else:
+            print("There's an error. Error Message: " + result[1])
+            
 
 
 if __name__ == "__main__":

@@ -104,7 +104,8 @@ def command_add(date, event_details, calendar):
 
     if date not in calendar.keys():
         calendar[date] = []
-    calendar[date].append(event_details)
+    else:
+        calendar[date].append(event_details)
     return ''
 
 
@@ -140,9 +141,9 @@ def command_show(calendar):
     showResult = ""
     listOfDates = list(calendar.keys())
     listOfDates.sort()
+    count = 0
     for date in listOfDates:
         showResult += "\n    " + date + ":"
-        count = 0
         for details in calendar[date]:
             showResult += "\n        " + str(count) + ": " + details
             count += 1
@@ -203,7 +204,7 @@ def command_delete(date, entry_number, calendar):
         if entry_number not in range(len(calendar[date])):
             return 'There is no entry ' + str(entry_number) + ' on date ' + date + ' in the calendar'
         else:
-            if len(calendar[date]) < 2:
+            if len(calendar[date]) == 1:
                 del calendar[date]
             else:
                 calendar[date].pop(entry_number)
@@ -295,15 +296,15 @@ def load_calendar():
     if os.path.exists(f):
         with open(f, "r") as file:
             for line in file:
-                arr = line.split(":")
-                calendar[arr[0]] = []
-                details = arr[1].split("\t")
+                array = line.split(":")
+                calendar[array[0]] = []
+                details = array[1].split("\t")
                 for detail in details:
-                    calendar[arr[0]].append(detail)
-                calendar[arr[0]] = calendar[arr[0]][:-1]
+                    calendar[array[0]].append(detail)
+                calendar[array[0]] = calendar[array[0]][:-1]
     else:
         file=open(f, "w+")
-    file.close()
+        file.close()
     return calendar
 
 
@@ -391,7 +392,7 @@ def is_calendar_date(date):
 
         return month < 13 and day < 32 and (year > 1 and year < 9999)
 
-    except ValueError:
+    except:
         return False
 
 def is_natural_number(str):
@@ -423,7 +424,7 @@ def is_natural_number(str):
     # Check that all characters are in ["0123456789"]
 
     # YOUR CODE GOES HERE
-    listOfNumbers = "0123456789"
+    listOfNumbers = ["1","2","3","4","5","6","7","8","9","0"]
     if len(str) == 0:
         return False
     for i in str:
@@ -503,11 +504,15 @@ def parse_command(line):
             return ["error", "not a valid calendar date"]
         else:
             return ["add", listOfCommands[1], eventDetails]
+
     elif listOfCommands[0] == "show":
         if len(listOfCommands) != 1:
             return ["error", "show"]
         else:
             return ["show"]
+    elif listOfCommands[0] == "quit":
+        return ["quit"]
+        
     elif listOfCommands[0] == "delete":
         if len(listOfCommands) != 3:
             return ["error", "delete DATE NUMBER"]
@@ -517,8 +522,6 @@ def parse_command(line):
             return ["error", "not a valid event index"]
         else:
             return ["delete", listOfCommands[1], listOfCommands[2]]
-    elif listOfCommands[0] == "quit":
-        return ["quit"]
     else:
         return ["help"]
 
